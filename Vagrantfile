@@ -12,10 +12,10 @@ Vagrant.configure(Vagrant_API_Version) do |config|
       vb.customize ["modifyvm", :id, "--cpus",1]
       vb.customize ["modifyvm", :id, "--memory",1024]
     end
-    cfg.vm.host_name="web-01"
+    cfg.vm.host_name="web-01.mma.com"
     cfg.vm.synced_folder ".", "/vagrant", disabled: true
     cfg.vm.network "private_network", ip: "192.168.111.11"
-    # cfg.vm.network "forwarded_port", guest: 22, host: 19211, auto_correct: false, id: "ssh"
+    cfg.vm.network "forwarded_port", guest: 22, host: 19211, auto_correct: false, id: "ssh"
     cfg.vm.provision "shell", path: "Scripts/bash_ssh_conf_CentOS.sh"
   end
 
@@ -42,7 +42,7 @@ Vagrant.configure(Vagrant_API_Version) do |config|
     end
     cfg.vm.host_name="ansible-server"
     cfg.vm.synced_folder ".", "/vagrant", disabled: true
-    cfg.vm.network "public_network", ip: "192.168.111.2"
+    cfg.vm.network "private_network", ip: "192.168.111.2"
     cfg.vm.network "forwarded_port", guest: 22, host: 19210, auto_correct: false, id: "ssh"
     # env
     cfg.vm.provision "shell", path: "scripts/bootstrap.sh" 
@@ -60,6 +60,8 @@ Vagrant.configure(Vagrant_API_Version) do |config|
     cfg.vm.provision "shell", inline: "ansible-playbook install_web_nginx.yaml", privileged: false
     cfg.vm.provision "file", source: "ansible/web/install_docker_nginx.yaml", destination: "install_docker_nginx.yaml"
     cfg.vm.provision "shell", inline: "ansible-playbook install_docker_nginx.yaml", privileged: false
+    cfg.vm.provision "file", source: "ansible/web/install_https_web.yaml", destination: "install_https_web.yaml"
+    cfg.vm.provision "shell", inline: "ansible-playbook install_https_web.yaml", privileged: false
     # WAS
     # cfg.vm.provision "file", source: "ansible/WAS/run_tomcat_container.yaml", destination: "run_tomcat_container.yaml"
     # cfg.vm.provision "shell", inline: "ansible-playbook run_tomcat_container.yaml", privileged: false
